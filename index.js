@@ -16,10 +16,21 @@ app.get("/", (req, res) => {
 
 app.post("/api/chat", (req, res) => {
     const { message } = req.body;
+    let reply = "Je ne comprends pas encore 🤔";
 
-    res.json({
-        reply: `Coach IA : j'ai reçu ton message ->  "${message}"`,
-    });
+    if (message.toLowerCase().includes("react")) {
+        reply = "React est une librairie pour créer des interfaces UI 🧩";
+    } else if (message.toLowerCase().includes("typescript")) {
+        reply = "TypeScript aide à éviter des bugs grâce aux types 🛡️"
+    } else if (message.toLowerCase().includes("ia")) {
+        reply = "L’IA, c’est donner des règles + du contexte + un objectif 🧠";
+    } else if (message.toLowerCase().includes("chatgpt")) {
+        reply = "ChatGPT est un assistant IA créé par OpenAI 🤖"
+    } else if (message.toLowerCase().includes("openai")) {
+        reply = "OpenAI est une entreprise qui développe des IA 🤖"
+    }
+
+    res.json({ reply });
 });
 
 app.listen(PORT, () => {
