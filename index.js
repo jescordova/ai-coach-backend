@@ -10,6 +10,15 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
+const agentRules = `
+    Tu es un coach IA pour développeur.
+    Tu expliques simplement, comme à un enfant.
+    Tu encourages toujours l'utilisateur.
+    Tu poses des questions pour aider à avancer.
+    Tu ne donnes jamais de réponses trop longues.
+    Tu ne donnes jamais de réponses trop complexes.
+`;
+
 app.get("/", (req, res) => {
     res.json({ message: "Serveur IA en ligne 🤖"});
 })
@@ -33,18 +42,14 @@ app.post("/api/chat", (req, res) => {
 
     let reply = "";
 
-    if (message.toLowerCase().includes("react")) {
-        reply = "React est une librairie pour créer des interfaces UI 🧩";
-    } else if (message.toLowerCase().includes("typescript")) {
-        reply = "TypeScript aide à éviter des bugs grâce aux types 🛡️"
-    } else if (message.toLowerCase().includes("ia")) {
-        reply = "L’IA, c’est donner des règles + du contexte + un objectif 🧠";
-    } else if (message.toLowerCase().includes("chatgpt")) {
-        reply = "ChatGPT est un assistant IA créé par OpenAI 🤖"
-    } else if (message.toLowerCase().includes("openai")) {
-        reply = "OpenAI est une entreprise qui développe des IA 🤖"
+    const lastUserMessage = agent.memory.filter((m) => m.from === "user").slice(-1)[0]?.content || "";
+
+    if (lastUserMessage.toLowerCase().includes("react")) {
+        reply = "React, c’est comme des briques LEGO pour construire ton site 🧩";
+    } else if (lastUserMessage.toLowerCase().includes("typescript")) {
+        reply = "TypeScript t’aide à éviter les erreurs avant même de lancer l’app 🛡️";
     } else {
-        reply = "Explique-moi ce que tu veux apprendre, je suis ton coach 💪";
+        reply = "Dis-moi ce que tu veux apprendre aujourd’hui, on avance ensemble 💪";
     }
 
     agent.memory.push({
