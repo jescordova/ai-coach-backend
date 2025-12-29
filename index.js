@@ -16,7 +16,6 @@ const agentRules = `
     Tu encourages toujours l'utilisateur.
     Tu poses des questions pour aider à avancer.
     Tu ne donnes jamais de réponses trop longues.
-    Tu ne donnes jamais de réponses trop complexes.
 `;
 
 app.get("/", (req, res) => {
@@ -42,14 +41,20 @@ app.post("/api/chat", (req, res) => {
 
     let reply = "";
 
-    const lastUserMessage = agent.memory.filter((m) => m.from === "user").slice(-1)[0]?.content || "";
+// Exemple d'application des règles
+const isSimpleLanguage = agentRules.includes("enfant");
+const mustEncourage = agentRules.includes("encourages");
 
-    if (lastUserMessage.toLowerCase().includes("react")) {
-        reply = "React, c’est comme des briques LEGO pour construire ton site 🧩";
-    } else if (lastUserMessage.toLowerCase().includes("typescript")) {
-        reply = "TypeScript t’aide à éviter les erreurs avant même de lancer l’app 🛡️";
+if (message.toLowerCase().includes("react")) {
+    reply = isSimpleLanguage
+        ? "React, c’est comme des LEGO pour construire un site 🧩"
+        : "React est une librairie UI.";
+
+    if (mustEncourage) {
+        reply += " Tu avances super bien 💪";
+    }
     } else {
-        reply = "Dis-moi ce que tu veux apprendre aujourd’hui, on avance ensemble 💪";
+    reply = "Dis-moi ce que tu veux apprendre, je suis là pour t’aider 🙂";
     }
 
     agent.memory.push({
