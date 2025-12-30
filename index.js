@@ -46,31 +46,64 @@ function saveToMemory(from, content) {
   }
 }
 
+const actions = {
+    GIVE_EXERCISE: "give_exercise",
+    GIVE_EXPLANATION: "give_explanation",
+    ENCOURAGE: "encourage",
+};
+
+function decideAction(message) {
+  const msg = message.toLowerCase();
+
+  if (msg.includes("exercice") || msg.includes("pratique")) {
+    return actions.GIVE_EXERCISE;
+  }
+
+  if (msg.includes("react") || msg.includes("typescript")) {
+    return actions.GIVE_EXPLANATION;
+  }
+
+  return actions.ENCOURAGE;
+}
+
 app.post("/api/chat", (req, res) => {
     const { message } = req.body;
 
     agent.state = "thinking";
     saveToMemory("user", message);
 
+    const action = decideAction(message);
+
     let reply = "";
 
-    if (message.toLowerCase().includes("react")) {
-        reply = "🎯 Objectif: progresser.\n";
-        reply += "React, c’est comme des briques LEGO pour ton site 🧩.\n";
-        reply += "👉 Conseil: crée un petit composant aujourd’hui.\n";
-        reply += "Tu avances bien 💪";
-    } else {
+    switch (action) {
+    case actions.GIVE_EXERCISE:
         reply =
-        "Dis-moi ce que tu veux apprendre aujourd’hui, on fait ça étape par étape 🙂";
+            "🛠️ Exercice: crée un composant React `Button` avec une prop `label`.\n" +
+            "Objectif: comprendre les props.\n" +
+            "Tu peux le faire 💪";
+        break;
+
+        case actions.GIVE_EXPLANATION:
+        reply =
+            "📘 Explication simple: React, c’est des composants réutilisables 🧩.\n" +
+            "Petit conseil: commence toujours petit.\n" +
+            "Tu avances bien 👏";
+        break;
+
+        default:
+        reply =
+            "Je suis là pour t’aider. Dis-moi ce que tu veux apprendre aujourd’hui 🙂";
     }
+
     saveToMemory("agent", reply);
     agent.state = "answering";
 
     res.json({
         reply,
-        goal: agent.goal,
+        action,
         state: agent.state,
-        memory: agent.memory,
+        memorySize: agent.memory.length,
     });
 });
 
